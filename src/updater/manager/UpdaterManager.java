@@ -80,12 +80,36 @@ public class UpdaterManager {
 
     private void checkFiles() {
         if (selectedFolder != null) {
-            // Aquí se puede implementar la lógica para comprobar los archivos.
+            // Llamada al método para recorrer directorios y archivos
             System.out.println("Comprobando archivos en la carpeta: " + selectedFolder.getAbsolutePath());
-            // Ejecuta el cliente
-            runClient();
+            listFilesAndDirectories(selectedFolder);
         } else {
             JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna carpeta.");
+        }
+    }
+
+    private void listFilesAndDirectories(File folder) {
+        // Verifica si el archivo o directorio existe
+        if (folder.exists()) {
+            // Obtiene la lista de archivos y directorios dentro de la carpeta
+            File[] files = folder.listFiles();
+            if (files != null) {
+                // Recorre cada archivo y directorio
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        System.out.println("Directorio: " + file.getAbsolutePath());
+                        // Llamada recursiva para recorrer subdirectorios
+                        listFilesAndDirectories(file);
+                    } else {
+                        System.out.println("Archivo: " + file.getAbsolutePath());
+                        // Aquí puedes añadir la lógica para procesar cada archivo
+                    }
+                }
+            } else {
+                System.out.println("No se pudo acceder a los archivos en el directorio.");
+            }
+        } else {
+            System.out.println("El directorio no existe: " + folder.getAbsolutePath());
         }
     }
 
@@ -139,26 +163,23 @@ public class UpdaterManager {
         }
     }
 
-private void executeWithElevation(String exePath) {
-    // Obtiene la ruta al directorio donde se encuentra el archivo JAR
-    String jarDir = new File(System.getProperty("user.dir")).getAbsolutePath();
-    
-    // Construye la ruta al archivo runElevated.bat en la carpeta dist
-    String batFilePath = new File(jarDir, "dist/runElevated.bat").getAbsolutePath();
-    
-    try {
-        // Llama al script para ejecutar el programa con privilegios elevados
-        ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", batFilePath, exePath);
-        processBuilder.redirectErrorStream(true); // Combina stdout y stderr
-        Process process = processBuilder.start();
-        // Espera a que el proceso termine
-        process.waitFor();
-    } catch (IOException | InterruptedException e) {
-        e.printStackTrace();
+    private void executeWithElevation(String exePath) {
+        // Obtiene la ruta al directorio donde se encuentra el archivo JAR
+        String jarDir = new File(System.getProperty("user.dir")).getAbsolutePath();
+
+        // Construye la ruta al archivo runElevated.bat en la carpeta dist
+        String batFilePath = new File(jarDir, "dist/runElevated.bat").getAbsolutePath();
+
+        try {
+            // Llama al script para ejecutar el programa con privilegios elevados
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", batFilePath, exePath);
+            processBuilder.redirectErrorStream(true); // Combina stdout y stderr
+            Process process = processBuilder.start();
+            // Espera a que el proceso termine
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-}
-
-
-
 
 }

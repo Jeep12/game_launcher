@@ -13,6 +13,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import updater.fonts.Fuentes;
+import java.awt.Font;
 
 /**
  *
@@ -22,13 +24,16 @@ public class Updater extends javax.swing.JFrame {
 
     int yMouse, xMouse;
     private UpdaterManager updaterManager;
+    private Fuentes fuenteL2;
 
-    /**
-     * Creates new form Updater
-     */
     public Updater() {
         initComponents();
         setupContentPanel();
+
+        fuenteL2 = new Fuentes();
+        Font fuentePersonalizada = fuenteL2.fuente(fuenteL2.RIO, Font.PLAIN, 40);
+        this.logo.setFont(fuentePersonalizada);
+        this.logo.setForeground(Color.WHITE); // 
 
     }
 
@@ -80,6 +85,7 @@ public class Updater extends javax.swing.JFrame {
         btnCheckFiles = new javax.swing.JButton();
         btnPlay = new javax.swing.JButton();
         btnMenu = new javax.swing.JLabel();
+        logo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -147,6 +153,9 @@ public class Updater extends javax.swing.JFrame {
         btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnLogin.setForeground(new java.awt.Color(255, 255, 255));
         btnLogin.setText("INGRESAR");
+        btnLogin.setBorder(null);
+        btnLogin.setBorderPainted(false);
+        btnLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoginActionPerformed(evt);
@@ -157,6 +166,9 @@ public class Updater extends javax.swing.JFrame {
         btnSingUp.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnSingUp.setForeground(new java.awt.Color(255, 255, 255));
         btnSingUp.setText("REGISTRARSE");
+        btnSingUp.setBorder(null);
+        btnSingUp.setBorderPainted(false);
+        btnSingUp.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSingUp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSingUpActionPerformed(evt);
@@ -232,6 +244,8 @@ public class Updater extends javax.swing.JFrame {
         btnSelectFolder.setForeground(new java.awt.Color(255, 255, 255));
         btnSelectFolder.setText("SELECCIONAR CARPETA");
         btnSelectFolder.setBorder(null);
+        btnSelectFolder.setBorderPainted(false);
+        btnSelectFolder.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         panelBtns.add(btnSelectFolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 45));
 
         btnCheckFiles.setBackground(new java.awt.Color(0, 0, 0));
@@ -240,6 +254,7 @@ public class Updater extends javax.swing.JFrame {
         btnCheckFiles.setText("COMPROBAR ARCHIVOS");
         btnCheckFiles.setBorder(null);
         btnCheckFiles.setBorderPainted(false);
+        btnCheckFiles.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCheckFiles.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCheckFilesActionPerformed(evt);
@@ -252,6 +267,8 @@ public class Updater extends javax.swing.JFrame {
         btnPlay.setForeground(new java.awt.Color(255, 255, 255));
         btnPlay.setText("JUGAR");
         btnPlay.setBorder(null);
+        btnPlay.setBorderPainted(false);
+        btnPlay.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnPlay.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnPlayMouseClicked(evt);
@@ -265,11 +282,14 @@ public class Updater extends javax.swing.JFrame {
         panelBtns.add(btnPlay, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 220, 45));
 
         btnMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/updater/imgupdater/iconpng.png"))); // NOI18N
+        btnMenu.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnMenu.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnMenuMouseClicked(evt);
             }
         });
+
+        logo.setText("Lineage II Terra");
 
         javax.swing.GroupLayout contentLayout = new javax.swing.GroupLayout(content);
         content.setLayout(contentLayout);
@@ -278,17 +298,19 @@ public class Updater extends javax.swing.JFrame {
             .addGroup(contentLayout.createSequentialGroup()
                 .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(contentLayout.createSequentialGroup()
-                        .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(contentLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btnSingUp)
+                                .addGap(15, 15, 15)
+                                .addComponent(wrapper_tops, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(contentLayout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnSingUp, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnMenu))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, contentLayout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(wrapper_tops, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnMenu)))
                         .addGap(18, 18, 18)
                         .addComponent(wrapper_news, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(contentLayout.createSequentialGroup()
@@ -307,10 +329,11 @@ public class Updater extends javax.swing.JFrame {
                         .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnMenu)
                             .addGroup(contentLayout.createSequentialGroup()
-                                .addGap(10, 10, 10)
+                                .addGap(13, 13, 13)
                                 .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnLogin)
-                                    .addComponent(btnSingUp))))
+                                    .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnSingUp, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(wrapper_tops, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(wrapper_news, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -374,17 +397,44 @@ public class Updater extends javax.swing.JFrame {
     private void btnMenuMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuMouseClicked
         btnCheckFiles.setVisible(true);
 
+        // Crear el JPopupMenu
         JPopupMenu popUpConfig = new JPopupMenu();
+
+        // Configurar el color de fondo del popup, eliminar bordes y añadir padding
+        popUpConfig.setBackground(Color.BLACK);
+        popUpConfig.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));  // Padding: top, left, bottom, right
 
         // Crear los elementos del menú
         JMenuItem item1 = new JMenuItem("CAMBIAR CARPETA");
         JMenuItem item2 = new JMenuItem("CAMBIAR CONTRASEÑA");
+
+        // Personalizar apariencia de los JMenuItem
+        Font itemFont = new Font("Arial", Font.PLAIN, 14);  // Fuente personalizada para los elementos del menú
+        Color itemBackground = Color.BLACK;
+        Color itemForeground = Color.WHITE;
+
+        // Configurar los JMenuItem
+        item1.setBackground(itemBackground);
+        item1.setForeground(itemForeground);
+        item1.setFont(itemFont);
+        item1.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));  // Padding: top, left, bottom, right
+        item1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cursor de mano
+
+        item2.setBackground(itemBackground);
+        item2.setForeground(itemForeground);
+        item2.setFont(itemFont);
+        item2.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));  // Padding: top, left, bottom, right
+        item2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cursor de mano
 
         // Crear el UpdaterManager
         UpdaterManager updaterManager = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath);
 
         // Añadir ActionListener al JMenuItem
         item1.addActionListener(e -> updaterManager.selectFolder());
+        item2.addActionListener(e -> {
+            // Acción para cambiar la contraseña
+            // Implementar la lógica para cambiar la contraseña aquí
+        });
 
         // Añadir los elementos al popup
         popUpConfig.add(item1);
@@ -434,6 +484,7 @@ public class Updater extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel logo;
     private javax.swing.JPanel panelBtns;
     private javax.swing.JPopupMenu popUpConfig;
     private javax.swing.JTextField showPath;

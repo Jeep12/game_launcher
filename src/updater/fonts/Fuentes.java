@@ -9,9 +9,8 @@ public class Fuentes {
     private Font font = null;
 
     // Ruta de las fuentes
-    public String RIO = "/updater/fonts/49_la2font.TTF";  
-    public String BPR = "/updater/fonts/BPreplay.otf";
-    public String ITROMATIC = "/updater/fonts/ltromatic.ttf";
+    public String RIO = "49_la2font.ttf";  
+  
 
     /**
      * Método para cargar una fuente desde un archivo
