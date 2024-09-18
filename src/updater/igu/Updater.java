@@ -10,6 +10,9 @@ import java.awt.Color;
 import javax.swing.ImageIcon;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  *
@@ -144,11 +147,21 @@ public class Updater extends javax.swing.JFrame {
         btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnLogin.setForeground(new java.awt.Color(255, 255, 255));
         btnLogin.setText("INGRESAR");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
 
         btnSingUp.setBackground(new java.awt.Color(0, 0, 0));
         btnSingUp.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnSingUp.setForeground(new java.awt.Color(255, 255, 255));
         btnSingUp.setText("REGISTRARSE");
+        btnSingUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSingUpActionPerformed(evt);
+            }
+        });
 
         wrapper_news.setBackground(new java.awt.Color(6, 0, 11));
 
@@ -385,6 +398,27 @@ public class Updater extends javax.swing.JFrame {
         UpdaterManager um = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath);
         um.runClient();
     }//GEN-LAST:event_btnPlayMouseClicked
+    private void openWebpage(String url) {
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                desktop.browse(new URI(url));
+            }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            // Manejo de errores, como mostrar un mensaje al usuario
+            JOptionPane.showMessageDialog(null, "No se pudo abrir la página web.");
+        }
+    }
+    private void btnSingUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSingUpActionPerformed
+        String url = "https://l2genesis.online/app/register";
+        openWebpage(url);
+    }//GEN-LAST:event_btnSingUpActionPerformed
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        String url = "https://l2genesis.online/app/login";
+        openWebpage(url);
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCheckFiles;
