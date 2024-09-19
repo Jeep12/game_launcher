@@ -15,7 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import updater.fonts.Fuentes;
 import java.awt.Font;
-
+import updater.manager.UpdaterManager;
 /**
  *
  * @author Administrador
@@ -53,13 +53,23 @@ public class Updater extends javax.swing.JFrame {
         this.panelBtns.setBackground(transparent);
 
         btnCheckFiles.setVisible(false);
+
         showPath.setEditable(false);
         showPath.setColumns(30);
         showPath.setHorizontalAlignment(JTextField.LEFT);
         showPath.setPreferredSize(new Dimension(content.getWidth() - jLabel3.getPreferredSize().width - 20, showPath.getPreferredSize().height));
         showPath.setToolTipText("Ruta de la carpeta seleccionada");
 
-        updaterManager = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath);
+        // Configura las barras de progreso
+        ProgresBarCheckFiles.setMinimum(0);
+        ProgresBarCheckFiles.setMaximum(100);
+        ProgresBarCheckFiles.setStringPainted(true);
+        ProgresBarCheckFiles.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        ProgresBarCheckFiles.setForeground(Color.BLUE);
+
+     
+
+        updaterManager = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath, ProgresBarCheckFiles);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,6 +90,8 @@ public class Updater extends javax.swing.JFrame {
         wrapper_loading = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         showPath = new javax.swing.JTextField();
+        ProgresBarCheckFiles = new javax.swing.JProgressBar();
+        jLabel5 = new javax.swing.JLabel();
         panelBtns = new javax.swing.JPanel();
         btnSelectFolder = new javax.swing.JButton();
         btnCheckFiles = new javax.swing.JButton();
@@ -215,16 +227,22 @@ public class Updater extends javax.swing.JFrame {
         showPath.setText(" ");
         showPath.setBorder(null);
 
+        jLabel5.setText("Estado");
+
         javax.swing.GroupLayout wrapper_loadingLayout = new javax.swing.GroupLayout(wrapper_loading);
         wrapper_loading.setLayout(wrapper_loadingLayout);
         wrapper_loadingLayout.setHorizontalGroup(
             wrapper_loadingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(wrapper_loadingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(showPath, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(327, Short.MAX_VALUE))
+                .addGroup(wrapper_loadingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, wrapper_loadingLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(showPath, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ProgresBarCheckFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 683, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         wrapper_loadingLayout.setVerticalGroup(
             wrapper_loadingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,6 +251,10 @@ public class Updater extends javax.swing.JFrame {
                 .addGroup(wrapper_loadingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(showPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ProgresBarCheckFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -246,7 +268,7 @@ public class Updater extends javax.swing.JFrame {
         btnSelectFolder.setBorder(null);
         btnSelectFolder.setBorderPainted(false);
         btnSelectFolder.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        panelBtns.add(btnSelectFolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 45));
+        panelBtns.add(btnSelectFolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 50));
 
         btnCheckFiles.setBackground(new java.awt.Color(0, 0, 0));
         btnCheckFiles.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -255,12 +277,17 @@ public class Updater extends javax.swing.JFrame {
         btnCheckFiles.setBorder(null);
         btnCheckFiles.setBorderPainted(false);
         btnCheckFiles.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCheckFiles.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnCheckFilesMouseClicked(evt);
+            }
+        });
         btnCheckFiles.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCheckFilesActionPerformed(evt);
             }
         });
-        panelBtns.add(btnCheckFiles, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 43));
+        panelBtns.add(btnCheckFiles, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 250, 50));
 
         btnPlay.setBackground(new java.awt.Color(0, 0, 0));
         btnPlay.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -279,7 +306,7 @@ public class Updater extends javax.swing.JFrame {
                 btnPlayActionPerformed(evt);
             }
         });
-        panelBtns.add(btnPlay, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 220, 45));
+        panelBtns.add(btnPlay, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 250, 50));
 
         btnMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/updater/imgupdater/iconpng.png"))); // NOI18N
         btnMenu.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -295,8 +322,9 @@ public class Updater extends javax.swing.JFrame {
         content.setLayout(contentLayout);
         contentLayout.setHorizontalGroup(
             contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(contentLayout.createSequentialGroup()
-                .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(contentLayout.createSequentialGroup()
                         .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(contentLayout.createSequentialGroup()
@@ -311,14 +339,13 @@ public class Updater extends javax.swing.JFrame {
                                 .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnMenu)))
-                        .addGap(18, 18, 18)
+                        .addGap(26, 26, 26)
                         .addComponent(wrapper_news, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(contentLayout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(wrapper_loading, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(panelBtns, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(145, 145, 145))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelBtns, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(137, 137, 137))
         );
         contentLayout.setVerticalGroup(
             contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -337,11 +364,11 @@ public class Updater extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(wrapper_tops, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(wrapper_news, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(22, 22, 22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(contentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(wrapper_loading, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelBtns, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         container.add(content, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 1010, 520));
@@ -391,7 +418,6 @@ public class Updater extends javax.swing.JFrame {
     }//GEN-LAST:event_btnPlayActionPerformed
 
     private void btnCheckFilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckFilesActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_btnCheckFilesActionPerformed
 
     private void btnMenuMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMenuMouseClicked
@@ -427,7 +453,7 @@ public class Updater extends javax.swing.JFrame {
         item2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Cursor de mano
 
         // Crear el UpdaterManager
-        UpdaterManager updaterManager = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath);
+        UpdaterManager updaterManager = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath, ProgresBarCheckFiles);
 
         // Añadir ActionListener al JMenuItem
         item1.addActionListener(e -> updaterManager.selectFolder());
@@ -445,8 +471,7 @@ public class Updater extends javax.swing.JFrame {
     }//GEN-LAST:event_btnMenuMouseClicked
 
     private void btnPlayMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPlayMouseClicked
-        UpdaterManager um = new UpdaterManager(btnSelectFolder, btnCheckFiles, showPath);
-        um.runClient();
+        this.updaterManager.runClient();
     }//GEN-LAST:event_btnPlayMouseClicked
     private void openWebpage(String url) {
         try {
@@ -470,7 +495,11 @@ public class Updater extends javax.swing.JFrame {
         openWebpage(url);
     }//GEN-LAST:event_btnLoginActionPerformed
 
+    private void btnCheckFilesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCheckFilesMouseClicked
+    }//GEN-LAST:event_btnCheckFilesMouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JProgressBar ProgresBarCheckFiles;
     private javax.swing.JButton btnCheckFiles;
     private javax.swing.JLabel btnExit;
     private javax.swing.JButton btnLogin;
@@ -484,6 +513,7 @@ public class Updater extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel logo;
     private javax.swing.JPanel panelBtns;
     private javax.swing.JPopupMenu popUpConfig;
