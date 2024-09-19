@@ -65,7 +65,7 @@ public class Updater extends javax.swing.JFrame {
         ProgresBarCheckFiles.setMaximum(100);
         ProgresBarCheckFiles.setStringPainted(true);
         ProgresBarCheckFiles.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        ProgresBarCheckFiles.setForeground(Color.BLUE);
+        ProgresBarCheckFiles.setForeground(Color.GREEN);
 
      
 
@@ -226,6 +226,9 @@ public class Updater extends javax.swing.JFrame {
         showPath.setForeground(new java.awt.Color(255, 255, 255));
         showPath.setText(" ");
         showPath.setBorder(null);
+
+        ProgresBarCheckFiles.setBorder(null);
+        ProgresBarCheckFiles.setBorderPainted(false);
 
         jLabel5.setText("Estado");
 

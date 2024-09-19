@@ -4,16 +4,18 @@ import updater.model.Component;
 import updater.model.DirectoryComposite;
 import updater.model.FileLeaf;
 import updater.utils.ZipExtractor;
-
 import updater.utils.FileDownloadWorker;
 import javax.swing.*;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.List;
 import java.util.Properties;
 
 public class UpdaterManager {
+
+    private static final int PROGRESS_UPDATE_INTERVAL = 1024 * 10; // Actualizar cada 10 KB
 
     private File selectedFolder;
     private JButton btnCheckFiles;
@@ -24,8 +26,7 @@ public class UpdaterManager {
     private static final String CONFIG_FILE = "config.properties";
     private JProgressBar loadingIndicatorCheckFiles;
 
-    public UpdaterManager(JButton btnSelectFolder, JButton btnCheckFiles, JTextField showPath,
-            JProgressBar loadingIndicatorCheckFiles) {
+    public UpdaterManager(JButton btnSelectFolder, JButton btnCheckFiles, JTextField showPath, JProgressBar loadingIndicatorCheckFiles) {
         this.btnSelectFolder = btnSelectFolder;
         this.btnCheckFiles = btnCheckFiles;
         this.showPath = showPath;
@@ -46,6 +47,13 @@ public class UpdaterManager {
         }
 
         setupListeners();
+        if (!isUpdateAvailable()) {
+            loadingIndicatorCheckFiles.setValue(100);
+            loadingIndicatorCheckFiles.setString("El cliente esta actualizado");
+        } else {
+            loadingIndicatorCheckFiles.setValue(0);
+            loadingIndicatorCheckFiles.setString("Hay una actualizacion disponible");
+        }
     }
 
     private void setupListeners() {
@@ -77,31 +85,66 @@ public class UpdaterManager {
 
     private void checkFiles() {
         if (selectedFolder != null) {
-            showLoadingIndicator(true, "Verificando archivos...");
-
+            // Reset y mostrar la barra de progreso para la verificación de archivos
             SwingUtilities.invokeLater(() -> {
-                DirectoryComposite rootDirectory = new DirectoryComposite(selectedFolder.getAbsolutePath());
-                populateComponents(rootDirectory, selectedFolder);
+                // Inicializa la barra de progreso a 0 y visible
+                loadingIndicatorCheckFiles.setValue(0);
+                loadingIndicatorCheckFiles.setString("Verificando archivos...");
+                loadingIndicatorCheckFiles.setVisible(true);
 
-                // Verificar versiones
-                rootDirectory.checkVersion();
+                // Crear y ejecutar la tarea de verificación
+                new Thread(() -> {
+                    DirectoryComposite rootDirectory = new DirectoryComposite(selectedFolder.getAbsolutePath());
+                    populateComponents(rootDirectory, selectedFolder);
 
-                String clientVersion = getClientVersion();
-                String serverVersion = getServerVersionFromServer();
+                    // Verificar versiones
+                    rootDirectory.checkVersion();
 
-                if (clientVersion.equals(serverVersion)) {
-                    showLoadingIndicator(false, ""); // Oculta las barras de progreso
-                    JOptionPane.showMessageDialog(null, "Todo OK. La versión del cliente está actualizada.");
-                } else {
-                    System.out.println("Actualizando archivos...");
-                    downloadFilesFromServer();
-                    updateClientVersion(serverVersion);
-                    showLoadingIndicator(true, "Descargando archivos...");
-                }
+                    String clientVersion = getClientVersion();
+                    String serverVersion = getServerVersionFromServer();
+
+                    if (clientVersion.equals(serverVersion)) {
+                        // Verificación completa, oculta la barra de progreso
+                        SwingUtilities.invokeLater(() -> {
+                            loadingIndicatorCheckFiles.setValue(100);
+                            loadingIndicatorCheckFiles.setString(" La versión del cliente está actualizada.");
+                            try {
+
+                                Thread.sleep(200); // Pausa para que el usuario vea el mensaje
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    } else {
+                        // Progreso para la descarga de archivos
+                        SwingUtilities.invokeLater(() -> {
+                            loadingIndicatorCheckFiles.setString("Descargando archivos...");
+                        });
+
+                        // Resetear la barra de progreso para la descarga
+                        downloadFilesFromServer();
+                        updateClientVersion(serverVersion);
+                    }
+                }).start();
             });
         } else {
             System.out.println("No se ha seleccionado ninguna carpeta.");
         }
+    }
+
+    private void simulateProgress() {
+        final int TOTAL_STEPS = 100;
+        new Thread(() -> {
+            for (int i = 0; i <= TOTAL_STEPS; i++) {
+                try {
+                    Thread.sleep(50); // Ajusta el tiempo para que la simulación sea más o menos lenta
+                    int progress = i; // Progreso actual
+                    SwingUtilities.invokeLater(() -> updateProgressBar(progress));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     private void populateComponents(DirectoryComposite directoryComposite, File directory) {
@@ -196,7 +239,7 @@ public class UpdaterManager {
             loadingIndicatorCheckFiles.setVisible(show);
 
             if (show) {
-                loadingIndicatorCheckFiles.setValue(0);
+                loadingIndicatorCheckFiles.setValue(0); // Reinicia el progreso a 0
                 loadingIndicatorCheckFiles.setString(message);
             } else {
                 loadingIndicatorCheckFiles.setString("");
@@ -242,7 +285,7 @@ public class UpdaterManager {
                 ZipExtractor.unzip(zipFile.getAbsolutePath(), selectedFolder.getAbsolutePath());
             }
 
-            System.out.println("Actualización completada.");
+            loadingIndicatorCheckFiles.setString("Actualización completada.");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -250,7 +293,14 @@ public class UpdaterManager {
         }
     }
 
-// Método para descargar un archivo dado una URL y destino
+    private void updateProgressBar(final int progress) {
+        SwingUtilities.invokeLater(() -> {
+            loadingIndicatorCheckFiles.setValue(progress);
+            loadingIndicatorCheckFiles.setString(progress + "%");
+        });
+    }
+
+    // Método para descargar un archivo dado una URL y destino
     private void downloadFile(String fileUrl, File destinationFile) {
         try (InputStream inputStream = new URL(fileUrl).openStream(); FileOutputStream fileOutputStream = new FileOutputStream(destinationFile)) {
 
@@ -259,13 +309,27 @@ public class UpdaterManager {
             long totalBytesRead = 0;
             long fileSize = new URL(fileUrl).openConnection().getContentLengthLong(); // Obtén el tamaño del archivo
 
+            long lastUpdateTime = System.currentTimeMillis();
+            long minUpdateInterval = 10; // Mínimo intervalo de actualización en milisegundos
+
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 fileOutputStream.write(buffer, 0, bytesRead);
                 totalBytesRead += bytesRead;
-                int progress = (int) (totalBytesRead * 100 / fileSize);
-                System.out.println("Descargando progreso: " + progress + "%");
+
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastUpdateTime > minUpdateInterval) {
+                    int progress = (int) (totalBytesRead * 100 / fileSize);
+                    updateProgressBar(progress);
+                    lastUpdateTime = currentTime;
+                }
+                // Simulación de progreso más lento
+                Thread.sleep(1); // Ajusta el tiempo de simulación
             }
-        } catch (IOException e) {
+
+            // Actualizar barra de progreso al final para asegurar el 100%
+            updateProgressBar(100);
+
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             System.out.println("Error al descargar el archivo: " + fileUrl);
         }
@@ -281,7 +345,7 @@ public class UpdaterManager {
         }
     }
 
-      private boolean isUpdateAvailable() {
+    private boolean isUpdateAvailable() {
         try {
             URL versionUrl = new URL("http://localhost/l2terraupdater/version.txt");
             BufferedReader in = new BufferedReader(new InputStreamReader(versionUrl.openStream()));
@@ -297,20 +361,31 @@ public class UpdaterManager {
     }
 
     public void runClient() {
-        if (selectedFolder != null) {
-            File clientExecutable = new File(selectedFolder, "system/l2.exe");
-            if (clientExecutable.exists()) {
-                try {
-                    executeWithElevation(clientExecutable.getAbsolutePath());
-                } catch (Exception ex) {
-                    System.err.println("No se pudo ejecutar el cliente.");
-                    ex.printStackTrace();
+        if (isUpdateAvailable()) {
+            // Si hay una actualización disponible, mostrar un mensaje y no ejecutar el cliente
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(null,
+                        "Hay una nueva versión disponible. Por favor, actualiza el cliente antes de ejecutar.",
+                        "Actualización Disponible",
+                        JOptionPane.INFORMATION_MESSAGE);
+            });
+        } else {
+            // Si no hay actualizaciones disponibles, proceder a ejecutar el cliente
+            if (selectedFolder != null) {
+                File clientExecutable = new File(selectedFolder, "system/l2.exe");
+                if (clientExecutable.exists()) {
+                    try {
+                        executeWithElevation(clientExecutable.getAbsolutePath());
+                    } catch (Exception ex) {
+                        System.err.println("No se pudo ejecutar el cliente.");
+                        ex.printStackTrace();
+                    }
+                } else {
+                    System.out.println("El archivo ejecutable no se encuentra en la ruta especificada.");
                 }
             } else {
-                System.out.println("El archivo ejecutable no se encuentra en la ruta especificada.");
+                System.out.println("No se ha seleccionado ninguna carpeta.");
             }
-        } else {
-            System.out.println("No se ha seleccionado ninguna carpeta.");
         }
     }
 
