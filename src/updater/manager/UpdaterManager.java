@@ -23,7 +23,7 @@ public class UpdaterManager {
     private JFileChooser folderChooser;
     private JTextField showPath;
     private String lastPath;
-    private static final String CONFIG_FILE = "config.properties";
+    private static final String CONFIG_FILE = System.getProperty("user.home") + "/L2Terra/config/config.properties";
     private JProgressBar loadingIndicatorCheckFiles;
 
     public UpdaterManager(JButton btnSelectFolder, JButton btnCheckFiles, JTextField showPath, JProgressBar loadingIndicatorCheckFiles) {
@@ -208,30 +208,35 @@ public class UpdaterManager {
     private void saveLastPath(String path) {
         Properties properties = new Properties();
         properties.setProperty("lastPath", path);
-        try {
-            properties.store(Files.newOutputStream(Paths.get(CONFIG_FILE)), null);
+
+        // Crea la carpeta config si no existe
+        File configFile = new File(CONFIG_FILE);
+        File configDir = configFile.getParentFile();
+        if (!configDir.exists()) {
+            configDir.mkdirs(); // Crear la carpeta si no existe
+        }
+
+        // Guarda el archivo config.properties dentro de la carpeta config
+        try (OutputStream out = new FileOutputStream(configFile)) {
+            properties.store(out, null);
+            System.out.println("Archivo de configuración guardado en: " + configFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private String loadLastPath() {
-        try {
-            Path path = Paths.get(CONFIG_FILE);
-            if (Files.exists(path)) {
+        File configFile = new File(CONFIG_FILE);
+        if (configFile.exists()) {
+            try (InputStream in = new FileInputStream(configFile)) {
                 Properties props = new Properties();
-                try (InputStream in = Files.newInputStream(path)) {
-                    props.load(in);
-                    return props.getProperty("lastPath");
-                }
-            } else {
-                Files.createFile(path);
-                return null;
+                props.load(in);
+                return props.getProperty("lastPath");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     private void showLoadingIndicator(boolean show, String message) {
